@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.uv.delivery.converters.usuarios.ClienteActualizarConverter;
@@ -95,33 +96,38 @@ public class ClienteService {
     }
     
     public ClienteRegistradoDTO update(ClienteActualizarDTO clienteActualizarDTO, long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Cliente> optionalCliente = clienteRepository.findById(id);
         if (!optionalCliente.isEmpty()){
-            Usuario usuario=usuarioRepository.findByEmail(clienteActualizarDTO.getEmail());
-            if (usuario.getId()==optionalCliente.get().getId()){
-                String fecha=dateValidation(clienteActualizarDTO.getFechaNacimiento());
-                if (fecha!=null && !fecha.equals("Invalid Date.")){
-                    clienteActualizarDTO.setFechaNacimiento(fecha);
-                    if(!generoRepository.findById(clienteActualizarDTO.getIdGenero()).isEmpty()){
-                        if(telefonoValidation(clienteActualizarDTO.getTelefono())){
-                            Cliente clienteTemp=clienteActualizarConverter.dtotoEntity(clienteActualizarDTO);
-                            clienteTemp.setDireccion(optionalCliente.get().getDireccion());
-                            clienteTemp.setId(optionalCliente.get().getId());
-                            clienteTemp.setPassword(optionalCliente.get().getPassword());
-                            clienteTemp=clienteRepository.save(clienteTemp);
-                            ClienteRegistradoDTO cliente=clienteRegistradoConverter.entitytoDTO(clienteTemp);
-                            return cliente;
+            if (email.equals(optionalCliente.get().getEmail())){
+                Usuario usuario=usuarioRepository.findByEmail(clienteActualizarDTO.getEmail());
+                if (usuario.getId()==optionalCliente.get().getId()){
+                    String fecha=dateValidation(clienteActualizarDTO.getFechaNacimiento());
+                    if (fecha!=null && !fecha.equals("Invalid Date.")){
+                        clienteActualizarDTO.setFechaNacimiento(fecha);
+                        if(!generoRepository.findById(clienteActualizarDTO.getIdGenero()).isEmpty()){
+                            if(telefonoValidation(clienteActualizarDTO.getTelefono())){
+                                Cliente clienteTemp=clienteActualizarConverter.dtotoEntity(clienteActualizarDTO);
+                                clienteTemp.setDireccion(optionalCliente.get().getDireccion());
+                                clienteTemp.setId(optionalCliente.get().getId());
+                                clienteTemp.setPassword(optionalCliente.get().getPassword());
+                                clienteTemp=clienteRepository.save(clienteTemp);
+                                ClienteRegistradoDTO cliente=clienteRegistradoConverter.entitytoDTO(clienteTemp);
+                                return cliente;
+                            }else{
+                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            }
                         }else{
-                            throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -129,10 +135,15 @@ public class ClienteService {
     }
     
     public boolean delete(long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Cliente> optionalCliente = clienteRepository.findById(id);
         if (!optionalCliente.isEmpty()){
-            clienteRepository.delete(optionalCliente.get());
-            return true;
+            if (email.equals(optionalCliente.get().getEmail())){
+                clienteRepository.delete(optionalCliente.get());
+                return true;
+            }else{
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+            }
         }else{
             return false;
         }

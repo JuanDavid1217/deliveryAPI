@@ -4,9 +4,16 @@
  */
 package org.uv.delivery.models.usuario;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.uv.delivery.models.Tienda;
 
 /**
  *
@@ -14,6 +21,18 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="encargados")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Encargado extends Trabajador implements Serializable{
+    @OneToMany(mappedBy="encargado", cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
+    private List<Tienda> tiendas;
+
+    public List<Tienda> getTienda() {
+        return tiendas;
+    }
+
+    public void setTienda(List<Tienda> tiendas) {
+        this.tiendas = tiendas;
+    }
+    
     
 }

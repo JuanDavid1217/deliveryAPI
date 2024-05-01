@@ -28,7 +28,17 @@ public class DireccionController {
     
     @PutMapping("/actualizarPorUsuario/{id}")
     public ResponseEntity<Void> updateByUser(@RequestBody DireccionNuevaDTO direccionNueva, @PathVariable("id") long id){
-        Direccion direccion = direccionService.update(direccionNueva, id);
+        Direccion direccion = direccionService.updateUsuarioDireccion(direccionNueva, id);
+        if (direccion!=null){
+            return ResponseEntity.noContent().build();
+        }else{
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
+    @PutMapping("/actualizarPorTienda/{id}")
+    public ResponseEntity<Void> updateByTienda(@RequestBody DireccionNuevaDTO direccionNueva, @PathVariable("id") long id){
+        Direccion direccion= direccionService.updateTiendaDireccion(direccionNueva, id);
         if (direccion!=null){
             return ResponseEntity.noContent().build();
         }else{

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.uv.delivery.converters.usuarios.EncargadoActualizarConverter;
@@ -95,33 +96,38 @@ public class EncargadoService {
     }
     
     public EncargadoRegistradoDTO update(EncargadoActualizarDTO encargadoActualizarDTO, long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Encargado> optionalEncargado = encargadoRepository.findById(id);
         if (!optionalEncargado.isEmpty()){
-            Usuario usuario=usuarioRepository.findByEmail(encargadoActualizarDTO.getEmail());
-            if (usuario.getId()==optionalEncargado.get().getId()){
-                String fecha=dateValidation(encargadoActualizarDTO.getFechaNacimiento());
-                if (fecha!=null && !fecha.equals("Invalid Date.")){
-                    encargadoActualizarDTO.setFechaNacimiento(fecha);
-                    if(!generoRepository.findById(encargadoActualizarDTO.getIdGenero()).isEmpty()){
-                        if(telefonoValidation(encargadoActualizarDTO.getTelefono())){
-                            Encargado encargadoTemp = encargadoActualizarConverter.dtotoEntity(encargadoActualizarDTO);
-                            encargadoTemp.setDireccion(optionalEncargado.get().getDireccion());
-                            encargadoTemp.setId(optionalEncargado.get().getId());
-                            encargadoTemp.setPassword(optionalEncargado.get().getPassword());
-                            encargadoTemp = encargadoRepository.save(encargadoTemp);
-                            EncargadoRegistradoDTO encargadoDTO = encargadoRegistradoConverter.entitytoDTO(encargadoTemp);
-                            return encargadoDTO;
+            if (email.equals(optionalEncargado.get().getEmail())){
+                Usuario usuario=usuarioRepository.findByEmail(encargadoActualizarDTO.getEmail());
+                if (usuario.getId()==optionalEncargado.get().getId()){
+                    String fecha=dateValidation(encargadoActualizarDTO.getFechaNacimiento());
+                    if (fecha!=null && !fecha.equals("Invalid Date.")){
+                        encargadoActualizarDTO.setFechaNacimiento(fecha);
+                        if(!generoRepository.findById(encargadoActualizarDTO.getIdGenero()).isEmpty()){
+                            if(telefonoValidation(encargadoActualizarDTO.getTelefono())){
+                                Encargado encargadoTemp = encargadoActualizarConverter.dtotoEntity(encargadoActualizarDTO);
+                                encargadoTemp.setDireccion(optionalEncargado.get().getDireccion());
+                                encargadoTemp.setId(optionalEncargado.get().getId());
+                                encargadoTemp.setPassword(optionalEncargado.get().getPassword());
+                                encargadoTemp = encargadoRepository.save(encargadoTemp);
+                                EncargadoRegistradoDTO encargadoDTO = encargadoRegistradoConverter.entitytoDTO(encargadoTemp);
+                                return encargadoDTO;
+                            }else{
+                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            }
                         }else{
-                            throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -129,10 +135,15 @@ public class EncargadoService {
     }
     
     public boolean delete(long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Encargado> optionalEncargado = encargadoRepository.findById(id);
         if (!optionalEncargado.isEmpty()){
-            encargadoRepository.delete(optionalEncargado.get());
-            return true;
+            if(email.equals(optionalEncargado.get().getEmail())){
+                encargadoRepository.delete(optionalEncargado.get());
+                return true;
+            }else{
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+            }
         }else{
             return false;
         }

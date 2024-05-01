@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.uv.delivery.converters.VehiculoConverter;
@@ -106,34 +107,39 @@ public class RepartidorService {
     }
     
     public RepartidorRegistradoDTO update(RepartidorActualizarDTO repartidorActualizarDTO, long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Repartidor> optionalRepartidor = repartidorRepository.findById(id);
         if (!optionalRepartidor.isEmpty()){
-            Usuario usuario=usuarioRepository.findByEmail(repartidorActualizarDTO.getEmail());
-            if (usuario.getId()==optionalRepartidor.get().getId()){
-                String fecha=dateValidation(repartidorActualizarDTO.getFechaNacimiento());
-                if (fecha!=null && !fecha.equals("Invalid Date.")){
-                    repartidorActualizarDTO.setFechaNacimiento(fecha);
-                    if(!generoRepository.findById(repartidorActualizarDTO.getIdGenero()).isEmpty()){
-                        if(telefonoValidation(repartidorActualizarDTO.getTelefono())){
-                            Repartidor repartidorTemp = repartidorActualizarConverter.dtotoEntity(repartidorActualizarDTO);
-                            repartidorTemp.setDireccion(optionalRepartidor.get().getDireccion());
-                            repartidorTemp.setId(optionalRepartidor.get().getId());
-                            repartidorTemp.setPassword(optionalRepartidor.get().getPassword());
-                            repartidorTemp.setVehiculo(optionalRepartidor.get().getVehiculo());
-                            repartidorTemp = repartidorRepository.save(repartidorTemp);
-                            RepartidorRegistradoDTO repartidorDTO = repartidorRegistradoConverter.entitytoDTO(repartidorTemp);
-                            return repartidorDTO;
+            if(email.equals(optionalRepartidor.get().getEmail())){
+                Usuario usuario=usuarioRepository.findByEmail(repartidorActualizarDTO.getEmail());
+                if (usuario.getId()==optionalRepartidor.get().getId()){
+                    String fecha=dateValidation(repartidorActualizarDTO.getFechaNacimiento());
+                    if (fecha!=null && !fecha.equals("Invalid Date.")){
+                        repartidorActualizarDTO.setFechaNacimiento(fecha);
+                        if(!generoRepository.findById(repartidorActualizarDTO.getIdGenero()).isEmpty()){
+                            if(telefonoValidation(repartidorActualizarDTO.getTelefono())){
+                                Repartidor repartidorTemp = repartidorActualizarConverter.dtotoEntity(repartidorActualizarDTO);
+                                repartidorTemp.setDireccion(optionalRepartidor.get().getDireccion());
+                                repartidorTemp.setId(optionalRepartidor.get().getId());
+                                repartidorTemp.setPassword(optionalRepartidor.get().getPassword());
+                                repartidorTemp.setVehiculo(optionalRepartidor.get().getVehiculo());
+                                repartidorTemp = repartidorRepository.save(repartidorTemp);
+                                RepartidorRegistradoDTO repartidorDTO = repartidorRegistradoConverter.entitytoDTO(repartidorTemp);
+                                return repartidorDTO;
+                            }else{
+                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            }
                         }else{
-                            throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -141,10 +147,15 @@ public class RepartidorService {
     }
     
     public boolean delete(long id){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Repartidor> optionalRepartidor = repartidorRepository.findById(id);
         if (!optionalRepartidor.isEmpty()){
-            repartidorRepository.delete(optionalRepartidor.get());
-            return true;
+            if (email.equals(optionalRepartidor.get().getEmail())){
+                repartidorRepository.delete(optionalRepartidor.get());
+                return true;
+            }else{
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+            }
         }else{
             return false;
         }
@@ -165,11 +176,16 @@ public class RepartidorService {
     }
     
     public Vehiculo updateVehiculo(long id, VehiculoNuevoDTO vehiculoNuevo){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Repartidor> optionalRepartidor = repartidorRepository.findById(id);
         if (!optionalRepartidor.isEmpty()){
-            Vehiculo vehiculo = vehiculoConverter.dtotoEntity(vehiculoNuevo);
-            vehiculo.setIdVehiculo(optionalRepartidor.get().getVehiculo().getIdVehiculo());
-            return vehiculoRepository.save(vehiculo);
+            if (email.equals(optionalRepartidor.get().getEmail())){
+                Vehiculo vehiculo = vehiculoConverter.dtotoEntity(vehiculoNuevo);
+                vehiculo.setIdVehiculo(optionalRepartidor.get().getVehiculo().getIdVehiculo());
+                return vehiculoRepository.save(vehiculo);
+            }else{
+                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+            }
         }else{
             return null;
         }
