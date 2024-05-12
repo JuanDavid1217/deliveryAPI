@@ -31,11 +31,7 @@ public class ProductoRegistradoConverter implements ConverterRegistrado<Producto
         producto.setPrecio(entity.getPrecio());
         producto.setStock(entity.getStock());
         producto.setIdTienda(entity.getTienda().getIdTienda());
-        List<Long> categorias = new ArrayList<>();
-        for (Categoria categoria:entity.getCategorias()){
-            categorias.add(categoria.getIdCategoria());
-        }
-        producto.setCategoriasId(categorias);
+        producto.setCategorias(entity.getCategorias());
         return producto;
     }
 
