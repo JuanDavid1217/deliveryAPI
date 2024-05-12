@@ -47,7 +47,7 @@ public class GeneroServices {
                 generoRepository.delete(genero);
                 return true;
             }catch(Exception e){
-                throw new Exceptions("El id "+id+" no se puede eliminar ya que presenta relaciones.", HttpStatus.CONFLICT);
+                throw new Exceptions("El genero: "+optionalGenero.get().getDescripcion()+" no se puede eliminar ya que presenta relaciones.", HttpStatus.CONFLICT);
             }
         }else{
             return false;
