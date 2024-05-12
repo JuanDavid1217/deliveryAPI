@@ -6,6 +6,7 @@ package org.uv.delivery.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -51,6 +53,8 @@ public class Tienda implements Serializable{
     private Encargado encargado;
     @Column()
     private double calificacion;
+    @OneToMany(mappedBy="tienda", fetch=FetchType.LAZY, cascade={CascadeType.REMOVE, CascadeType.MERGE})
+    private List<Producto> productos;
 
     public long getIdTienda() {
         return idTienda;
@@ -122,6 +126,14 @@ public class Tienda implements Serializable{
 
     public void setCalificacion(double calificacion) {
         this.calificacion = calificacion;
+    }
+
+    public List<Producto> getProductos() {
+        return productos;
+    }
+
+    public void setProductos(List<Producto> productos) {
+        this.productos = productos;
     }
     
     

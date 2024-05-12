@@ -4,7 +4,6 @@
  */
 package org.uv.delivery.dtos.usuarios;
 
-import java.io.Serializable;
 
 
 /**

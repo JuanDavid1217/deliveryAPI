@@ -5,12 +5,12 @@
 package org.uv.delivery.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.uv.delivery.models.Categoria;
+import org.uv.delivery.models.Producto;
 
 /**
  *
  * @author juan
  */
-public interface CategoriaRepository extends JpaRepository<Categoria, Long>{
-    public Categoria findByDescripcion(String descripcion);
+public interface ProductoRepository extends JpaRepository<Producto, Long>{
+    
 }

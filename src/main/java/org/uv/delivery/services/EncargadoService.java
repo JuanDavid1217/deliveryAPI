@@ -7,6 +7,7 @@ package org.uv.delivery.services;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,6 @@ import org.uv.delivery.repository.DireccionRepository;
 import org.uv.delivery.repository.EncargadoRepository;
 import org.uv.delivery.repository.GeneroRepository;
 import org.uv.delivery.repository.UsuarioRepository;
-import org.uv.delivery.security.JWTUtils;
 import static org.uv.delivery.validations.Validation.dateValidation;
 import static org.uv.delivery.validations.Validation.telefonoValidation;
 
@@ -43,7 +43,17 @@ public class EncargadoService {
     private final DireccionRepository direccionRepository;
     private final GeneroRepository generoRepository;
     private final PasswordEncoder pe;
-    private final JWTUtils jwtUtils;
+    
+    @Value("${message.general.inautorizado}")
+    private String acceso;
+    @Value("${message.usuarioService.telefono}")
+    private String telefono;
+    @Value("${message.usuarioService.genero}")
+    private String genero;
+    @Value("${message.usuarioService.fecha}")
+    private String fechaInvalida;
+    @Value("${message.usuarioService.email}")
+    private String emailRegistrado;
     
     public EncargadoService(EncargadoNuevoConverter encargadoNuevoConverter,
             EncargadoRegistradoConverter encargadoRegistradoConverter,
@@ -51,8 +61,7 @@ public class EncargadoService {
             DireccionRepository direccionRepository,
             EncargadoRepository encargadoRepository,
             GeneroRepository generoRepository,
-            UsuarioRepository usuarioRepository, PasswordEncoder pe,
-            JWTUtils jwtUtils){
+            UsuarioRepository usuarioRepository, PasswordEncoder pe){
         this.encargadoNuevoConverter = encargadoNuevoConverter;
         this.encargadoRegistradoConverter = encargadoRegistradoConverter;
         this.encargadoRepository = encargadoRepository;
@@ -61,7 +70,6 @@ public class EncargadoService {
         this.direccionRepository=direccionRepository;
         this.generoRepository = generoRepository;
         this.pe=pe;
-        this.jwtUtils=jwtUtils;
     }
     
     @Transactional
@@ -79,16 +87,15 @@ public class EncargadoService {
                         Direccion direccion = direccionRepository.save(encargado.getDireccion());
                         encargado.setDireccion(direccion);
                         encargado=encargadoRepository.save(encargado);
-                        EncargadoRegistradoDTO encargadoRegistrado = encargadoRegistradoConverter.entitytoDTO(encargado);
-                        return encargadoRegistrado;
+                        return encargadoRegistradoConverter.entitytoDTO(encargado);
                     }else{
-                        throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                        throw new Exceptions(telefono, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                    throw new Exceptions(genero, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -101,7 +108,7 @@ public class EncargadoService {
         if (!optionalEncargado.isEmpty()){
             if (email.equals(optionalEncargado.get().getEmail())){
                 Usuario usuario=usuarioRepository.findByEmail(encargadoActualizarDTO.getEmail());
-                if (usuario.getId()==optionalEncargado.get().getId()){
+                if (usuario==null || (usuario!=null && usuario.getId()==optionalEncargado.get().getId())){
                     String fecha=dateValidation(encargadoActualizarDTO.getFechaNacimiento());
                     if (fecha!=null && !fecha.equals("Invalid Date.")){
                         encargadoActualizarDTO.setFechaNacimiento(fecha);
@@ -112,22 +119,21 @@ public class EncargadoService {
                                 encargadoTemp.setId(optionalEncargado.get().getId());
                                 encargadoTemp.setPassword(optionalEncargado.get().getPassword());
                                 encargadoTemp = encargadoRepository.save(encargadoTemp);
-                                EncargadoRegistradoDTO encargadoDTO = encargadoRegistradoConverter.entitytoDTO(encargadoTemp);
-                                return encargadoDTO;
+                                return encargadoRegistradoConverter.entitytoDTO(encargadoTemp);
                             }else{
-                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                                throw new Exceptions(telefono, HttpStatus.CONFLICT);
                             }
                         }else{
-                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                            throw new Exceptions(genero, HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                        throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                    throw new Exceptions(emailRegistrado, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -142,7 +148,7 @@ public class EncargadoService {
                 encargadoRepository.delete(optionalEncargado.get());
                 return true;
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return false;

@@ -34,7 +34,7 @@ public class TiendaController {
         this.tiendaService = tiendaService;
     }
     
-    @PostMapping("/guardarTiendaporEncargado/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<TiendaRegistradaDTO> save(@PathVariable("id") long idEncargado, @RequestBody TiendaNuevaDTO tiendaNueva){
         TiendaRegistradaDTO tienda = tiendaService.save(idEncargado, tiendaNueva);
         if(tienda!=null){

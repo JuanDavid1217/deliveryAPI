@@ -5,6 +5,7 @@
 package org.uv.delivery.services;
 
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ public class DireccionService {
     private final UsuarioRepository usuarioRepository;
     private final TiendaRepository tiendaRepository;
     
+    @Value("${message.general.inautorizado}")
+    private String acceso;
+    
     public DireccionService(DireccionRepository direccionRepository,
             DireccionConverter direccionConverter, UsuarioRepository usuarioRepository,
             TiendaRepository tiendaRepository){
@@ -47,7 +51,7 @@ public class DireccionService {
                 direccion.setIdDireccion(optionalUsuario.get().getDireccion().getIdDireccion());
                 return direccionRepository.save(direccion);
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             } 
         }else{
             return null;
@@ -63,7 +67,7 @@ public class DireccionService {
                 direccion.setIdDireccion(optionalTienda.get().getDireccion().getIdDireccion());
                 return direccionRepository.save(direccion);
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;

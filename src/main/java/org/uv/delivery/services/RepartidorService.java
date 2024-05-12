@@ -7,6 +7,7 @@ package org.uv.delivery.services;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +30,6 @@ import org.uv.delivery.repository.GeneroRepository;
 import org.uv.delivery.repository.RepartidorRepository;
 import org.uv.delivery.repository.UsuarioRepository;
 import org.uv.delivery.repository.VehiculoRepository;
-import org.uv.delivery.security.JWTUtils;
 import static org.uv.delivery.validations.Validation.dateValidation;
 import static org.uv.delivery.validations.Validation.telefonoValidation;
 
@@ -49,7 +49,17 @@ public class RepartidorService {
     private final VehiculoRepository vehiculoRepository;
     private final VehiculoConverter vehiculoConverter;
     private final PasswordEncoder pe;
-    private final JWTUtils jwtUtils;
+    
+    @Value("${message.general.inautorizado}")
+    private String acceso;
+    @Value("${message.usuarioService.telefono}")
+    private String telefono;
+    @Value("${message.usuarioService.genero}")
+    private String genero;
+    @Value("${message.usuarioService.fecha}")
+    private String fechaInvalida;
+    @Value("${message.usuarioService.email}")
+    private String emailRegistrado;
     
     public RepartidorService(RepartidorNuevoConverter repartidorNuevoConverter,
             RepartidorRegistradoConverter repartidorRegistradoConverter,
@@ -58,8 +68,7 @@ public class RepartidorService {
             RepartidorRepository repartidorRepository,
             GeneroRepository generoRepository, VehiculoRepository vehiculoRepository,
             VehiculoConverter vehiculoConverter,
-            UsuarioRepository usuarioRepository, PasswordEncoder pe,
-            JWTUtils jwtUtils){
+            UsuarioRepository usuarioRepository, PasswordEncoder pe){
         this.repartidorNuevoConverter = repartidorNuevoConverter;
         this.repartidorRegistradoConverter = repartidorRegistradoConverter;
         this.repartidorRepository = repartidorRepository;
@@ -70,7 +79,6 @@ public class RepartidorService {
         this.vehiculoConverter = vehiculoConverter;
         this.generoRepository = generoRepository;
         this.pe = pe;
-        this.jwtUtils = jwtUtils;
     }
     
     @Transactional
@@ -90,16 +98,15 @@ public class RepartidorService {
                         Vehiculo vehiculo = vehiculoRepository.save(repartidor.getVehiculo());
                         repartidor.setVehiculo(vehiculo);
                         repartidor = repartidorRepository.save(repartidor);
-                        RepartidorRegistradoDTO repartidorRegistrado = repartidorRegistradoConverter.entitytoDTO(repartidor);
-                        return repartidorRegistrado;
+                        return repartidorRegistradoConverter.entitytoDTO(repartidor);
                     }else{
-                        throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                        throw new Exceptions(telefono, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                    throw new Exceptions(genero, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -112,7 +119,7 @@ public class RepartidorService {
         if (!optionalRepartidor.isEmpty()){
             if(email.equals(optionalRepartidor.get().getEmail())){
                 Usuario usuario=usuarioRepository.findByEmail(repartidorActualizarDTO.getEmail());
-                if (usuario.getId()==optionalRepartidor.get().getId()){
+                if (usuario==null || (usuario!=null && usuario.getId()==optionalRepartidor.get().getId())){
                     String fecha=dateValidation(repartidorActualizarDTO.getFechaNacimiento());
                     if (fecha!=null && !fecha.equals("Invalid Date.")){
                         repartidorActualizarDTO.setFechaNacimiento(fecha);
@@ -124,22 +131,21 @@ public class RepartidorService {
                                 repartidorTemp.setPassword(optionalRepartidor.get().getPassword());
                                 repartidorTemp.setVehiculo(optionalRepartidor.get().getVehiculo());
                                 repartidorTemp = repartidorRepository.save(repartidorTemp);
-                                RepartidorRegistradoDTO repartidorDTO = repartidorRegistradoConverter.entitytoDTO(repartidorTemp);
-                                return repartidorDTO;
+                                return repartidorRegistradoConverter.entitytoDTO(repartidorTemp);
                             }else{
-                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                                throw new Exceptions(telefono, HttpStatus.CONFLICT);
                             }
                         }else{
-                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                            throw new Exceptions(genero, HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                        throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                    throw new Exceptions(emailRegistrado, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -154,7 +160,7 @@ public class RepartidorService {
                 repartidorRepository.delete(optionalRepartidor.get());
                 return true;
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return false;

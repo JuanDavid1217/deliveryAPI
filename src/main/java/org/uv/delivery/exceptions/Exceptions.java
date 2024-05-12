@@ -19,7 +19,7 @@ public class Exceptions extends RuntimeException{
         this.message=message;
         this.httpStatus=httpStatus;
     }
-
+    @Override
     public String getMessage() {
         return message;
     }

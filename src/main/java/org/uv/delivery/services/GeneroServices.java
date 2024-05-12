@@ -58,14 +58,12 @@ public class GeneroServices {
         Optional<Genero> optionalGenero = generoRepository.findById(id);
         if(!optionalGenero.isEmpty()){
             Genero genero = generoRepository.findByDescripcion(generoNuevoDTO.getDescripcion());
-            if (genero!=null){
-                if (genero.getIdGenero()!=id){
-                    throw new Exceptions("El genero "+generoNuevoDTO.getDescripcion()+" ya se encuentra registrado.", HttpStatus.CONFLICT);
-                }
-            }else{
+            if(genero==null || (genero!=null && genero.getIdGenero()==optionalGenero.get().getIdGenero())){
                 genero = optionalGenero.get();
                 genero.setDescripcion(generoNuevoDTO.getDescripcion());
                 genero=generoRepository.save(genero);
+            }else{
+                throw new Exceptions("El genero "+generoNuevoDTO.getDescripcion()+" ya se encuentra registrado.", HttpStatus.CONFLICT);
             }
             return genero;
         }else{

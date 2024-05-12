@@ -7,6 +7,7 @@ package org.uv.delivery.services;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,13 @@ public class TiendaService {
     private final TiendaActualizarConverter tiendaActualizarConverter;
     private final DireccionRepository direccionRepository;
     
+    @Value("${message.general.inautorizado}")
+    private String acceso;
+    @Value("${message.usuarioService.telefono}")
+    private String telefono;
+    @Value("${message.tiendaService.tiendaNoRegistrada}")
+    private String tiendaNoRegistrada;
+    
     public TiendaService(TiendaNuevaConverter tiendaNuevaConverter,
         TiendaRegistradaConverter tiendaRegistradaConverter,
         EncargadoRepository encargadoRepository, TiendaRepository tiendaRepository,
@@ -54,59 +62,92 @@ public class TiendaService {
     
     @Transactional
     public TiendaRegistradaDTO save(long idEncargado, TiendaNuevaDTO tiendaNueva){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
         Optional<Encargado> encargadoOptional = encargadoRepository.findById(idEncargado);
         if(!encargadoOptional.isEmpty()){
-            if (encargadoOptional.get().getTienda().isEmpty()){
-                if (telefonoValidation(tiendaNueva.getTelefono())){
-                    Tienda tienda =tiendaNuevaConverter.dtotoEntity(tiendaNueva);
-                    Direccion direccion = direccionRepository.save(tienda.getDireccion());
-                    tienda.setDireccion(direccion);
-                    tienda.setEncargado(encargadoOptional.get());
-                    tienda = tiendaRepository.save(tienda);
-                    return tiendaRegistradaConverter.entitytoDTO(tienda);
+            if (email.equals(encargadoOptional.get().getEmail())){
+                if (encargadoOptional.get().getTienda().isEmpty()){
+                    if (telefonoValidation(tiendaNueva.getTelefono())){
+                        Tienda tienda =tiendaNuevaConverter.dtotoEntity(tiendaNueva);
+                        Direccion direccion = direccionRepository.save(tienda.getDireccion());
+                        tienda.setDireccion(direccion);
+                        tienda.setEncargado(encargadoOptional.get());
+                        tienda = tiendaRepository.save(tienda);
+                        return tiendaRegistradaConverter.entitytoDTO(tienda);
+                    }else{
+                        throw new Exceptions(telefono, HttpStatus.CONFLICT);
+                    }
                 }else{
-                    throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                    throw new Exceptions("El usuario: "+idEncargado+" ya cuenta con una tienda registrada.", HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("El usuario: "+idEncargado+" ya cuenta con una tienda registrada.", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;
         }
     }
      
-    public TiendaRegistradaDTO update(long idTienda, TiendaDTO tiendaActualizar){
-        Optional<Tienda> tiendaOptional = tiendaRepository.findById(idTienda);
-        if(!tiendaOptional.isEmpty()){
-            if (telefonoValidation(tiendaActualizar.getTelefono())){
-                Tienda tienda = tiendaActualizarConverter.dtotoEntity(tiendaActualizar);
-                tienda.setIdTienda(tiendaOptional.get().getIdTienda());
-                tienda.setDireccion(tiendaOptional.get().getDireccion());
-                tienda.setEncargado(tiendaOptional.get().getEncargado());
-                tienda = tiendaRepository.save(tienda);
-                return tiendaRegistradaConverter.entitytoDTO(tienda);
+    public TiendaRegistradaDTO update(long idEncargado, TiendaDTO tiendaActualizar){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Encargado> encargadoOptional = encargadoRepository.findById(idEncargado);
+        if(!encargadoOptional.isEmpty()){
+            if (email.equals(encargadoOptional.get().getEmail())){
+                if (!encargadoOptional.get().getTienda().isEmpty()){
+                    if (telefonoValidation(tiendaActualizar.getTelefono())){
+                        Tienda tiendaRegistrada = encargadoOptional.get().getTienda().get(0);
+                        Tienda tienda = tiendaActualizarConverter.dtotoEntity(tiendaActualizar);
+                        tienda.setIdTienda(tiendaRegistrada.getIdTienda());
+                        tienda.setDireccion(tiendaRegistrada.getDireccion());
+                        tienda.setEncargado(tiendaRegistrada.getEncargado());
+                        tienda = tiendaRepository.save(tienda);
+                        return tiendaRegistradaConverter.entitytoDTO(tienda);
+                    }else{
+                        throw new Exceptions(telefono, HttpStatus.CONFLICT);
+                    }
+                }else{
+                    throw new Exceptions(tiendaNoRegistrada, HttpStatus.CONFLICT);
+                }
             }else{
-                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;
         }
     }
     
-    public boolean delete(long idTienda){
-        Optional<Tienda> tiendaOptional = tiendaRepository.findById(idTienda);
-        if(!tiendaOptional.isEmpty()){
-            tiendaRepository.delete(tiendaOptional.get());
-            return true;
+    public boolean delete(long idEncargado){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Encargado> encargadoOptional = encargadoRepository.findById(idEncargado);
+        if(!encargadoOptional.isEmpty()){
+            if (email.equals(encargadoOptional.get().getEmail())){
+                if (!encargadoOptional.get().getTienda().isEmpty()){
+                    tiendaRepository.delete(encargadoOptional.get().getTienda().get(0));
+                    return true;
+                }else{
+                    throw new Exceptions(tiendaNoRegistrada, HttpStatus.CONFLICT);
+                }
+            }else{
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
+            }
         }else{
             return false;
         }
     }
     
-    public TiendaRegistradaDTO findById(long idTienda){
-        Optional<Tienda> tiendaOptional = tiendaRepository.findById(idTienda);
-        if(!tiendaOptional.isEmpty()){
-            return tiendaRegistradaConverter.entitytoDTO(tiendaOptional.get());
+    public TiendaRegistradaDTO findById(long idEncargado){
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Encargado> encargadoOptional = encargadoRepository.findById(idEncargado);
+        if(!encargadoOptional.isEmpty()){
+            if (email.equals(encargadoOptional.get().getEmail())){
+                if (!encargadoOptional.get().getTienda().isEmpty()){ 
+                    return tiendaRegistradaConverter.entitytoDTO(encargadoOptional.get().getTienda().get(0));
+                }else{
+                    throw new Exceptions(tiendaNoRegistrada, HttpStatus.CONFLICT);
+                }
+            }else{
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
+            }
         }else{
             return null;
         }

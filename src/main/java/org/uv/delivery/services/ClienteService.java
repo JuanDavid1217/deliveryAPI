@@ -7,6 +7,7 @@ package org.uv.delivery.services;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,6 @@ import org.uv.delivery.repository.DireccionRepository;
 import org.uv.delivery.repository.UsuarioRepository;
 import org.uv.delivery.repository.ClienteRepository;
 import org.uv.delivery.repository.GeneroRepository;
-import org.uv.delivery.security.JWTUtils;
 import static org.uv.delivery.validations.Validation.dateValidation;
 import static org.uv.delivery.validations.Validation.telefonoValidation;
 
@@ -43,7 +43,17 @@ public class ClienteService {
     private final DireccionRepository direccionRepository;
     private final GeneroRepository generoRepository;
     private final PasswordEncoder pe;
-    private final JWTUtils jwtUtils;
+    
+    @Value("${message.general.inautorizado}")
+    private String acceso;
+    @Value("${message.usuarioService.telefono}")
+    private String telefono;
+    @Value("${message.usuarioService.genero}")
+    private String genero;
+    @Value("${message.usuarioService.fecha}")
+    private String fechaInvalida;
+    @Value("${message.usuarioService.email}")
+    private String emailRegistrado;
     
     public ClienteService(ClienteNuevoConverter clienteNuevoConverter,
             ClienteRegistradoConverter clienteRegistradoConverter,
@@ -51,8 +61,7 @@ public class ClienteService {
             DireccionRepository direccionRepository,
             ClienteRepository clienteRepository,
             GeneroRepository generoRepository,
-            UsuarioRepository usuarioRepository, PasswordEncoder pe,
-            JWTUtils jwtUtils){
+            UsuarioRepository usuarioRepository, PasswordEncoder pe){
         this.clienteNuevoConverter=clienteNuevoConverter;
         this.clienteRegistradoConverter=clienteRegistradoConverter;
         this.clienteRepository=clienteRepository;
@@ -61,7 +70,6 @@ public class ClienteService {
         this.direccionRepository=direccionRepository;
         this.generoRepository = generoRepository;
         this.pe=pe;
-        this.jwtUtils=jwtUtils;
     }
     
     @Transactional
@@ -79,16 +87,15 @@ public class ClienteService {
                         Direccion direccion = direccionRepository.save(cliente.getDireccion());
                         cliente.setDireccion(direccion);
                         cliente=clienteRepository.save(cliente);
-                        ClienteRegistradoDTO clienteRegistrado=clienteRegistradoConverter.entitytoDTO(cliente);
-                        return clienteRegistrado;
+                        return clienteRegistradoConverter.entitytoDTO(cliente);
                     }else{
-                        throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                        throw new Exceptions(telefono, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                    throw new Exceptions(genero, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -101,7 +108,7 @@ public class ClienteService {
         if (!optionalCliente.isEmpty()){
             if (email.equals(optionalCliente.get().getEmail())){
                 Usuario usuario=usuarioRepository.findByEmail(clienteActualizarDTO.getEmail());
-                if (usuario.getId()==optionalCliente.get().getId()){
+                if (usuario==null || (usuario!=null && usuario.getId()==optionalCliente.get().getId())){
                     String fecha=dateValidation(clienteActualizarDTO.getFechaNacimiento());
                     if (fecha!=null && !fecha.equals("Invalid Date.")){
                         clienteActualizarDTO.setFechaNacimiento(fecha);
@@ -112,22 +119,21 @@ public class ClienteService {
                                 clienteTemp.setId(optionalCliente.get().getId());
                                 clienteTemp.setPassword(optionalCliente.get().getPassword());
                                 clienteTemp=clienteRepository.save(clienteTemp);
-                                ClienteRegistradoDTO cliente=clienteRegistradoConverter.entitytoDTO(clienteTemp);
-                                return cliente;
+                                return clienteRegistradoConverter.entitytoDTO(clienteTemp);
                             }else{
-                                throw new Exceptions("Número de teléfono invalido..", HttpStatus.CONFLICT);
+                                throw new Exceptions(telefono, HttpStatus.CONFLICT);
                             }
                         }else{
-                            throw new Exceptions("El genero seleccionado no existe.", HttpStatus.CONFLICT);
+                            throw new Exceptions(genero, HttpStatus.CONFLICT);
                         }
                     }else{
-                        throw new Exceptions("Fecha Invalida.", HttpStatus.CONFLICT);
+                        throw new Exceptions(fechaInvalida, HttpStatus.CONFLICT);
                     }
                 }else{
-                    throw new Exceptions("El email ingresado ya se encuentra registrado en otra cuenta.", HttpStatus.CONFLICT);
+                    throw new Exceptions(emailRegistrado, HttpStatus.CONFLICT);
                 }
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return null;
@@ -142,7 +148,7 @@ public class ClienteService {
                 clienteRepository.delete(optionalCliente.get());
                 return true;
             }else{
-                throw new Exceptions("Acceso Inautorizado", HttpStatus.CONFLICT);
+                throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
         }else{
             return false;
