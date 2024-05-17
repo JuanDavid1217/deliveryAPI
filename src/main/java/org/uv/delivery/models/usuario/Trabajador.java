@@ -15,7 +15,7 @@ import javax.persistence.InheritanceType;
  */
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class Trabajador extends Usuario{
+public abstract class Trabajador extends UsuarioBase{
     @Column()
     private String curp;
     @Column()

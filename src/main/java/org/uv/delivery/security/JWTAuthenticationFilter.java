@@ -21,7 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.uv.delivery.models.usuario.Usuario;
+import org.uv.delivery.models.usuario.UsuarioBase;
 import org.uv.delivery.models.usuario.Usuario1;
 
 /**

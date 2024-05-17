@@ -24,7 +24,7 @@ import org.uv.delivery.exceptions.Exceptions;
 import org.uv.delivery.models.Direccion;
 import org.uv.delivery.models.Vehiculo;
 import org.uv.delivery.models.usuario.Repartidor;
-import org.uv.delivery.models.usuario.Usuario;
+import org.uv.delivery.models.usuario.UsuarioBase;
 import org.uv.delivery.repository.DireccionRepository;
 import org.uv.delivery.repository.GeneroRepository;
 import org.uv.delivery.repository.RepartidorRepository;
@@ -83,7 +83,7 @@ public class RepartidorService {
     
     @Transactional
     public RepartidorRegistradoDTO save(RepartidorNuevoDTO repartidorNuevoDTO){
-        Usuario usuario=usuarioRepository.findByEmail(repartidorNuevoDTO.getEmail());
+        UsuarioBase usuario=usuarioRepository.findByEmail(repartidorNuevoDTO.getEmail());
         if (usuario==null){
             String fecha=dateValidation(repartidorNuevoDTO.getFechaNacimiento());
             if (fecha!=null && !fecha.equals("Invalid Date.")){
@@ -118,7 +118,7 @@ public class RepartidorService {
         Optional<Repartidor> optionalRepartidor = repartidorRepository.findById(id);
         if (!optionalRepartidor.isEmpty()){
             if(email.equals(optionalRepartidor.get().getEmail())){
-                Usuario usuario=usuarioRepository.findByEmail(repartidorActualizarDTO.getEmail());
+                UsuarioBase usuario=usuarioRepository.findByEmail(repartidorActualizarDTO.getEmail());
                 if (usuario==null || (usuario!=null && usuario.getId()==optionalRepartidor.get().getId())){
                     String fecha=dateValidation(repartidorActualizarDTO.getFechaNacimiento());
                     if (fecha!=null && !fecha.equals("Invalid Date.")){

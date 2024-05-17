@@ -15,7 +15,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="usuario")
-public class Cliente extends Usuario implements Serializable{
+public class Cliente extends UsuarioBase implements Serializable{
     @Column(name="foto_perfil")
     private String urlFoto;
 

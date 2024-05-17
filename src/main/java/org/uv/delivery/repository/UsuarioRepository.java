@@ -5,12 +5,12 @@
 package org.uv.delivery.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.uv.delivery.models.usuario.Usuario;
+import org.uv.delivery.models.usuario.UsuarioBase;
 
 /**
  *
  * @author juan
  */
-public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
-    public Usuario findByEmail(String email);
+public interface UsuarioRepository extends JpaRepository<UsuarioBase, Long>{
+    public UsuarioBase findByEmail(String email);
 }

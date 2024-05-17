@@ -14,7 +14,7 @@ import org.uv.delivery.dtos.DireccionNuevaDTO;
 import org.uv.delivery.exceptions.Exceptions;
 import org.uv.delivery.models.Direccion;
 import org.uv.delivery.models.Tienda;
-import org.uv.delivery.models.usuario.Usuario;
+import org.uv.delivery.models.usuario.UsuarioBase;
 import org.uv.delivery.repository.DireccionRepository;
 import org.uv.delivery.repository.TiendaRepository;
 import org.uv.delivery.repository.UsuarioRepository;
@@ -44,7 +44,7 @@ public class DireccionService {
     
     public Direccion updateUsuarioDireccion(DireccionNuevaDTO direccionNueva, long idUsuario){
         String email=SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Usuario> optionalUsuario = usuarioRepository.findById(idUsuario);
+        Optional<UsuarioBase> optionalUsuario = usuarioRepository.findById(idUsuario);
         if(!optionalUsuario.isEmpty()){
             if (email.equals(optionalUsuario.get().getEmail())){
                Direccion direccion = direccionConverter.dtotoEntity(direccionNueva);

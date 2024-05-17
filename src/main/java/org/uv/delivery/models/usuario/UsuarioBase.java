@@ -27,7 +27,7 @@ import org.uv.delivery.models.Genero;
  */
 @Entity
 @Inheritance(strategy=InheritanceType.TABLE_PER_CLASS)
-public abstract class Usuario {
+public abstract class UsuarioBase {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="usuarios_id_usuario_seq")
     @SequenceGenerator(name="usuarios_id_usuario_seq", sequenceName="usuarios_id_usuario_seq", initialValue=1, allocationSize=1)

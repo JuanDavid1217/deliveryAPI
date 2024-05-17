@@ -12,6 +12,6 @@ package org.uv.delivery.models.usuario;
 *Esta clase es solo para poder obtener los JSON Web Tokens
 *
 */
-public class Usuario1 extends Usuario{
+public class Usuario1 extends UsuarioBase{
     
 }

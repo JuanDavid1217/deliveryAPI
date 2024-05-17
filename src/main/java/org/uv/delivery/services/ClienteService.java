@@ -21,7 +21,7 @@ import org.uv.delivery.dtos.usuarios.ClienteRegistradoDTO;
 import org.uv.delivery.exceptions.Exceptions;
 import org.uv.delivery.models.Direccion;
 import org.uv.delivery.models.usuario.Cliente;
-import org.uv.delivery.models.usuario.Usuario;
+import org.uv.delivery.models.usuario.UsuarioBase;
 import org.uv.delivery.repository.DireccionRepository;
 import org.uv.delivery.repository.UsuarioRepository;
 import org.uv.delivery.repository.ClienteRepository;
@@ -74,7 +74,7 @@ public class ClienteService {
     
     @Transactional
     public ClienteRegistradoDTO save(ClienteNuevoDTO clienteNuevoDTO){
-        Usuario usuario=usuarioRepository.findByEmail(clienteNuevoDTO.getEmail());
+        UsuarioBase usuario=usuarioRepository.findByEmail(clienteNuevoDTO.getEmail());
         if (usuario==null){
             String fecha=dateValidation(clienteNuevoDTO.getFechaNacimiento());
             if (fecha!=null && !fecha.equals("Invalid Date.")){
@@ -107,7 +107,7 @@ public class ClienteService {
         Optional<Cliente> optionalCliente = clienteRepository.findById(id);
         if (!optionalCliente.isEmpty()){
             if (email.equals(optionalCliente.get().getEmail())){
-                Usuario usuario=usuarioRepository.findByEmail(clienteActualizarDTO.getEmail());
+                UsuarioBase usuario=usuarioRepository.findByEmail(clienteActualizarDTO.getEmail());
                 if (usuario==null || (usuario!=null && usuario.getId()==optionalCliente.get().getId())){
                     String fecha=dateValidation(clienteActualizarDTO.getFechaNacimiento());
                     if (fecha!=null && !fecha.equals("Invalid Date.")){
