@@ -20,7 +20,7 @@ import org.uv.delivery.models.Vehiculo;
  * @author juan
  */
 @Entity
-@Table(name="repartidores")
+@Table(name="repartidor")
 public class Repartidor extends Trabajador implements Serializable{
     @Column()
     private String licencia;

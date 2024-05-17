@@ -14,7 +14,7 @@ import javax.persistence.Table;
  * @author juan
  */
 @Entity
-@Table(name="cliente")
+@Table(name="usuario")
 public class Cliente extends Usuario implements Serializable{
     @Column(name="foto_perfil")
     private String urlFoto;
