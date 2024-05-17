@@ -22,7 +22,7 @@ import javax.persistence.Table;
  * @author juan
  */
 @Entity
-@Table(name="categorias")
+@Table(name="categoria")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Categoria implements Serializable{
     @Id
@@ -30,7 +30,7 @@ public class Categoria implements Serializable{
     @SequenceGenerator(name="categorias_id_categoria_seq", sequenceName="categorias_id_categoria_seq", initialValue=1, allocationSize=1)
     @Column(name="id_categoria")
     private long idCategoria;
-    @Column()
+    @Column(name="categoria")
     private String descripcion;
 
     public long getIdCategoria() {

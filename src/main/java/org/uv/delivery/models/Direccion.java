@@ -43,9 +43,9 @@ public class Direccion implements Serializable{
     private String calle3;
     @Column()
     private String referencia;
-    @Column(name="numero_exterior")
+    @Column(name="nomeroext")
     private String numeroExterior;
-    @Column(name="numero_interior")
+    @Column(name="nomeroint")
     private String numeroInterior;
 
     public long getIdDireccion() {

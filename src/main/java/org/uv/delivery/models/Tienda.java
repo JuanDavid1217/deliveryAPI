@@ -27,7 +27,7 @@ import org.uv.delivery.models.usuario.Encargado;
  * @author juan
  */
 @Entity
-@Table(name="tiendas")
+@Table(name="tienda")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Tienda implements Serializable{
     @Id
@@ -38,7 +38,7 @@ public class Tienda implements Serializable{
     @Column()
     private String nombre;
     @OneToOne(cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
-    @JoinColumn(name="id_direccion")
+    @JoinColumn(name="direccion")
     private Direccion direccion;
     @Column()
     private String telefono;
@@ -49,7 +49,7 @@ public class Tienda implements Serializable{
     @Column()
     private String horarios;
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="id_encargado")
+    @JoinColumn(name="encargado")
     private Encargado encargado;
     @Column()
     private double calificacion;

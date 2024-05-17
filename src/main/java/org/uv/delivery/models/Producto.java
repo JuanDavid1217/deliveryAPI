@@ -44,7 +44,7 @@ public class Producto implements Serializable{
     @Column()
     private double descuento;
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="id_tienda")
+    @JoinColumn(name="tienda")
     private Tienda tienda;
     @ManyToMany(fetch=FetchType.LAZY)
     private List<Categoria> categorias;

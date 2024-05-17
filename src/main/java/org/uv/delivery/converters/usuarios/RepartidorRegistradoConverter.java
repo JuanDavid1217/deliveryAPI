@@ -33,7 +33,6 @@ public class RepartidorRegistradoConverter implements ConverterRegistrado<Repart
         repartidor.setLicencia(entity.getLicencia());
         repartidor.setNombre(entity.getNombre());
         repartidor.setTelefono(entity.getTelefono());
-        repartidor.setUrlFoto(entity.getURLFoto());
         repartidor.setVehiculo(entity.getVehiculo());
         return repartidor;
     }

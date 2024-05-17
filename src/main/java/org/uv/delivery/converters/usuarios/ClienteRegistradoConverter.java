@@ -29,7 +29,7 @@ public class ClienteRegistradoConverter implements ConverterRegistrado<Cliente, 
         cliente.setGenero(entity.getGenero());
         cliente.setNombre(entity.getNombre());
         cliente.setTelefono(entity.getTelefono());
-        cliente.setUrlFoto(entity.getURLFoto());
+        cliente.setUrlFoto(entity.getUrlFoto());
         return cliente;
     }
 

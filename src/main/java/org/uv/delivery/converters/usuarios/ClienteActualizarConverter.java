@@ -30,7 +30,7 @@ public class ClienteActualizarConverter implements ConverterNuevo<Cliente, Clien
         cliente.setGenero(genero);
         cliente.setNombre(dto.getNombre());
         cliente.setTelefono(dto.getTelefono());
-        cliente.setURLFoto(dto.getUrlFoto());
+        cliente.setUrlFoto(dto.getUrlFoto());
         return cliente;
     }
 

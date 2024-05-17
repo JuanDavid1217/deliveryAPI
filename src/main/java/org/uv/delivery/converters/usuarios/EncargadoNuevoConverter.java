@@ -41,7 +41,6 @@ public class EncargadoNuevoConverter implements ConverterNuevo<Encargado, Encarg
         encargado.setNombre(dto.getNombre());
         encargado.setPassword(dto.getPassword());
         encargado.setTelefono(dto.getTelefono());
-        encargado.setURLFoto(dto.getUrlFoto());
         return encargado;
     }
 

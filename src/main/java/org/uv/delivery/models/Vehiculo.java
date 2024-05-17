@@ -19,13 +19,13 @@ import javax.persistence.Table;
  * @author juan
  */
 @Entity
-@Table(name="vehiculos")
+@Table(name="vehiculo")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Vehiculo implements Serializable{
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="vehiculos_id_vehiculo_seq")
     @SequenceGenerator(name="vehiculos_id_vehiculo_seq", sequenceName="vehiculos_id_vehiculo_seq", initialValue=1, allocationSize=1)
-    @Column(name="id_vahiculo")
+    @Column(name="id_vehiculo")
     private long idVehiculo;
     @Column()
     private String placa;

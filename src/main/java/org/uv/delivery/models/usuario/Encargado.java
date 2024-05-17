@@ -19,7 +19,7 @@ import org.uv.delivery.models.Tienda;
  * @author juan
  */
 @Entity
-@Table(name="encargados")
+@Table(name="encargado")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Encargado extends Trabajador implements Serializable{
     @OneToMany(mappedBy="encargado", cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)

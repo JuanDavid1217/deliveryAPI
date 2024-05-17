@@ -25,7 +25,7 @@ public class EstadoPedido implements Serializable{
     @SequenceGenerator(name="estado_pedido_id_estado_seq", sequenceName="estado_pedido_id_estado_seq", initialValue=1, allocationSize=1)
     @Column(name="id_estado")
     private long idEstado;
-    @Column()
+    @Column(name="estado_pedido")
     private String descripcion;
 
     public long getIdEstado() {

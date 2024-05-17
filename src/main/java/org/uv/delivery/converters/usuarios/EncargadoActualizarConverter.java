@@ -33,7 +33,6 @@ public class EncargadoActualizarConverter implements ConverterNuevo<Encargado, E
         encargado.setIne(dto.getIne());
         encargado.setNombre(dto.getNombre());
         encargado.setTelefono(dto.getTelefono());
-        encargado.setURLFoto(dto.getUrlFoto());
         return encargado;
     }
 

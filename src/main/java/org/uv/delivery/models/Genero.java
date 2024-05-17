@@ -27,7 +27,7 @@ public class Genero implements Serializable{
     @SequenceGenerator(name="genero_id_genero_seq", sequenceName="genero_id_genero_seq", initialValue=1, allocationSize=1)
     @Column(name="id_genero")
     private long idGenero;
-    @Column()
+    @Column(name="genero")
     private String descripcion;
 
     public long getIdGenero() {

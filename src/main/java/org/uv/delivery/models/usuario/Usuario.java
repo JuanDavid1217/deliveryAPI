@@ -34,11 +34,13 @@ public abstract class Usuario {
     @Column(name="id_usuario")
     private long idUsuario;
     @ManyToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name="id_genero")
+    @JoinColumn(name="genero")
     private Genero genero;
     @Column()
     private String nombre;
     @Column()
+    private String apellidos;
+    @Column(name="fecha_nacimiento")
     private Date fechaNacimiento;
     @Column()
     private String email;
@@ -47,10 +49,8 @@ public abstract class Usuario {
     @Column()
     private String telefono;
     @OneToOne(cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
-    @JoinColumn(name="id_direccion")
+    @JoinColumn(name="direccion")
     private Direccion direccion;
-    @Column()
-    private String urlFoto;
     
     public long getId() {
         return this.idUsuario;
@@ -76,6 +76,15 @@ public abstract class Usuario {
         this.nombre=nombre;
     }
 
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+    
+    
     public Date getFechaNacimiento() {
         return this.fechaNacimiento;
     }
@@ -114,13 +123,5 @@ public abstract class Usuario {
 
     public void setDireccion(Direccion direccion) {
         this.direccion=direccion;
-    }
-
-    public String getURLFoto() {
-        return this.urlFoto;
-    }
-    
-    public void setURLFoto(String urlFoto) {
-        this.urlFoto=urlFoto;
     }
 }

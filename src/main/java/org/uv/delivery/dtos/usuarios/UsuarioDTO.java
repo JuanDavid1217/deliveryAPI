@@ -15,7 +15,6 @@ public abstract class UsuarioDTO{
     private String fechaNacimiento;
     private String email;
     private String telefono;
-    private String urlFoto;
     
     
     public String getNombre() {
@@ -48,13 +47,5 @@ public abstract class UsuarioDTO{
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
-    }
-
-    public String getUrlFoto() {
-        return urlFoto;
-    }
-
-    public void setUrlFoto(String urlFoto) {
-        this.urlFoto = urlFoto;
     }
 }

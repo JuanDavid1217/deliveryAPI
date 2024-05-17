@@ -37,7 +37,7 @@ public class ClienteNuevoConverter implements ConverterNuevo<Cliente, ClienteNue
         cliente.setNombre(dto.getNombre());
         cliente.setPassword(dto.getPassword());
         cliente.setTelefono(dto.getTelefono());
-        cliente.setURLFoto(dto.getUrlFoto());
+        cliente.setUrlFoto(dto.getUrlFoto());
     
         return cliente;
     }

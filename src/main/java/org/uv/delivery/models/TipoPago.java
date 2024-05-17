@@ -25,7 +25,7 @@ public class TipoPago implements Serializable{
     @SequenceGenerator(name="tipo_pago_id_tipo_seq", sequenceName="tipo_pago_id_tipo_seq", initialValue=1, allocationSize=1)
     @Column(name="id_tipo")
     private long idTipo;
-    @Column()
+    @Column(name="tipo_pago")
     private String descripcion;
 
     public long getIdTipo() {
