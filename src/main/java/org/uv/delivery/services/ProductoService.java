@@ -123,4 +123,14 @@ public class ProductoService {
         List<Producto> productos = productoRepository.findAll();
         return productoRegistradoConverter.entityListtoDTOList(productos);
     }
+    
+    public List<ProductoRegistradoDTO> findAllByTienda(long idTienda){
+        Optional<Tienda> tiendaOptional = tiendaRepository.findById(idTienda);
+        if (!tiendaOptional.isEmpty()){
+            List<Producto> productos = tiendaOptional.get().getProductos();
+            return productoRegistradoConverter.entityListtoDTOList(productos);
+        }else{
+            return null;
+        }
+    }
 }

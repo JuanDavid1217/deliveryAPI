@@ -57,7 +57,7 @@ public class ProductoController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(long id){
+    public ResponseEntity<Void> delete(@PathVariable("id") long id){
         boolean response = productoService.delete(id);
         if(response){
             return ResponseEntity.ok().build();
@@ -67,7 +67,7 @@ public class ProductoController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoRegistradoDTO> findById(long id){
+    public ResponseEntity<ProductoRegistradoDTO> findById(@PathVariable("id") long id){
         ProductoRegistradoDTO producto = productoService.findById(id);
         if (producto != null){
             return ResponseEntity.ok(producto);
@@ -80,5 +80,15 @@ public class ProductoController {
     public ResponseEntity<List<ProductoRegistradoDTO>> findAll(){
         List<ProductoRegistradoDTO> productos = productoService.findAll();
         return ResponseEntity.ok(productos);
+    }
+    
+    @GetMapping("/findAllByTienda/{id}")
+    public ResponseEntity<List<ProductoRegistradoDTO>> findAllByTienda(@PathVariable("id") long id){
+        List<ProductoRegistradoDTO> productos = productoService.findAllByTienda(id);
+        if (productos==null){
+            return ResponseEntity.notFound().build();
+        }else{
+            return ResponseEntity.ok(productos);
+        }
     }
 }
