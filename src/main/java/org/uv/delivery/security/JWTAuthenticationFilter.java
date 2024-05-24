@@ -23,6 +23,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.uv.delivery.models.usuario.UsuarioBase;
 import org.uv.delivery.models.usuario.Usuario1;
+import org.uv.delivery.repository.UsuarioRepository;
 
 /**
  *
@@ -30,9 +31,11 @@ import org.uv.delivery.models.usuario.Usuario1;
  */
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
     private final JWTUtils jwtUtils;
+    private final UsuarioRepository usuarioRepository;
     
-    public JWTAuthenticationFilter(JWTUtils jwtUtils){
+    public JWTAuthenticationFilter(JWTUtils jwtUtils, UsuarioRepository usuarioRepository){
         this.jwtUtils=jwtUtils;
+        this.usuarioRepository = usuarioRepository;
     }
     
     @Override
@@ -59,11 +62,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain, 
                                             Authentication authResult) 
                                             throws IOException, ServletException {
-        User u=(User)authResult.getPrincipal();
-        String token=jwtUtils.generateAccesToken(u.getUsername());
         
+        User u=(User)authResult.getPrincipal();
+        UsuarioBase usuario = usuarioRepository.findByEmail(u.getUsername());
+        String token=jwtUtils.generateAccesToken(u.getUsername(), usuario.getId());
         response.addHeader("Authorization", token);
         Map<String, String> httpResponse = new HashMap<>();
+        httpResponse.put("id", String.valueOf(usuario.getId()));
         httpResponse.put("token", token);
         httpResponse.put("message", "Correct Authentication");
         httpResponse.put("Username", u.getUsername());

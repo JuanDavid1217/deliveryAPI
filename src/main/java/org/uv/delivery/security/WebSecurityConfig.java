@@ -14,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.uv.delivery.repository.UsuarioRepository;
 
 /**
  *
@@ -25,18 +26,20 @@ public class WebSecurityConfig {
     private final UserDetailsServiceImp udi;
     private final JWTUtils jwtUtils;
     private final JWTAuthorizationFilter jwtAuthorizationFilter;
+    private final UsuarioRepository usuario;
     
     public WebSecurityConfig(UserDetailsServiceImp udi, JWTUtils jwtUtils,
-            JWTAuthorizationFilter jwtAuthorizationFilter){
+            JWTAuthorizationFilter jwtAuthorizationFilter, UsuarioRepository usuario){
         this.udi=udi;
         this.jwtUtils=jwtUtils;
         this.jwtAuthorizationFilter=jwtAuthorizationFilter;
+        this.usuario = usuario;
     }
     
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, AuthenticationManager authenticationManager) throws Exception{
         
-        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtUtils);
+        JWTAuthenticationFilter jwtAuthenticationFilter = new JWTAuthenticationFilter(jwtUtils, usuario);
         jwtAuthenticationFilter.setAuthenticationManager(authenticationManager);
         jwtAuthenticationFilter.setFilterProcessesUrl("/users/login");
         
