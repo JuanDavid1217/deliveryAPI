@@ -18,6 +18,7 @@ import org.uv.delivery.dtos.ventas.VentaNuevaDTO;
 import org.uv.delivery.dtos.ventas.VentaRegistradaDTO;
 import org.uv.delivery.exceptions.Exceptions;
 import org.uv.delivery.models.DetalleVenta;
+import org.uv.delivery.models.Producto;
 import org.uv.delivery.models.Venta;
 import org.uv.delivery.models.usuario.Cliente;
 import org.uv.delivery.repository.ClienteRepository;
@@ -47,13 +48,13 @@ public class VentaService {
     private String acceso;
     @Value("${message.usuarioService.fecha}")
     private String fechaInvalida;
-    @Value("$message.ventaService.producto")
+    @Value("${message.ventaService.producto}")
     private String productoNoEncontrado;
-    @Value("$message.ventaService.estadoPedido")
+    @Value("${message.ventaService.estadoPedido}")
     private String estadoPedidoNoEncontrado;
-    @Value("$message.ventaService.estadoPago")
+    @Value("${message.ventaService.estadoPago}")
     private String estadoPagoNoEncontrado;
-    @Value("$message.ventaService.tipoPago")
+    @Value("${message.ventaService.tipoPago}")
     private String tipoPagoNoEncontrado;
     
     public VentaService(VentaRepository ventaRepository,
@@ -94,6 +95,13 @@ public class VentaService {
                                 venta = ventaRepository.save(venta);
                                 for(DetalleVenta detalle:detalles){
                                     detalle.setVenta(venta);
+                                    Producto producto = detalle.getProducto();
+                                    if (producto.getStock()>=detalle.getCantidad()){
+                                        producto.setStock(producto.getStock()-detalle.getCantidad());
+                                        productoRepository.save(producto);
+                                    }else{
+                                        throw new Exceptions("Cantidad insuficiente del producto: "+producto.getIdProducto(), HttpStatus.CONFLICT);
+                                    }
                                 }
                                 venta.setDetalles(detalles);
                                 venta= ventaRepository.save(venta);
@@ -135,10 +143,27 @@ public class VentaService {
                                         throw new Exceptions(productoNoEncontrado, HttpStatus.CONFLICT);
                                     }
                                 }
+                                List<DetalleVenta> detalles = optionalVenta.get().getDetalles();
+                                for(DetalleVenta detalle:detalles){
+                                    try{
+                                        Producto producto = detalle.getProducto();
+                                        producto.setStock(producto.getStock()+detalle.getCantidad());
+                                        productoRepository.save(producto);
+                                    }catch(Exception e){
+                                        throw new Exceptions(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+                                    }
+                                }
                                 Venta venta = ventaNuevaConverter.dtotoEntity(ventaNueva);
                                 venta.setIdVenta(optionalVenta.get().getIdVenta());
                                 for(DetalleVenta detalle:venta.getDetalles()){
                                     detalle.setVenta(venta);
+                                    Producto producto = detalle.getProducto();
+                                    if (producto.getStock()>=detalle.getCantidad()){
+                                        producto.setStock(producto.getStock()-detalle.getCantidad());
+                                        productoRepository.save(producto);
+                                    }else{
+                                        throw new Exceptions("Cantidad insuficiente del producto: "+producto.getIdProducto(), HttpStatus.CONFLICT);
+                                    }
                                 }
                                 venta = ventaRepository.save(venta);
                                 return ventaRegistradaConverter.entitytoDTO(venta); 
