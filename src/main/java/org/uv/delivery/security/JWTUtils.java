@@ -28,10 +28,11 @@ public class JWTUtils {
     private String timeExpiration;
     
     // Crear metodo generador de tokens
-    public String generateAccesToken(String username, long id){
+    public String generateAccesToken(String username, long id, String type){
         return Jwts.builder()
                 .setSubject(username)
                 .claim("id", id)
+                .claim("type", type)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+Long.parseLong(timeExpiration)))
                 .signWith(getSignatureKey(), SignatureAlgorithm.HS256)

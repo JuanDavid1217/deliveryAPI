@@ -5,9 +5,14 @@
 package org.uv.delivery.models.usuario;
 
 import java.io.Serializable;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import org.uv.delivery.models.Venta;
 
 /**
  *
@@ -18,7 +23,9 @@ import javax.persistence.Table;
 public class Cliente extends UsuarioBase implements Serializable{
     @Column(name="foto_perfil")
     private String urlFoto;
-
+    @OneToMany(mappedBy="cliente", cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
+    private List<Venta> ventas;
+    
     public String getUrlFoto() {
         return urlFoto;
     }
@@ -26,5 +33,14 @@ public class Cliente extends UsuarioBase implements Serializable{
     public void setUrlFoto(String urlFoto) {
         this.urlFoto = urlFoto;
     }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
+    }
+    
     
 }

@@ -8,8 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,10 +63,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         
         User u=(User)authResult.getPrincipal();
         UsuarioBase usuario = usuarioRepository.findByEmail(u.getUsername());
-        String token=jwtUtils.generateAccesToken(u.getUsername(), usuario.getId());
+        String [] parts = usuario.getClass().getName().split("[.]");
+        String token=jwtUtils.generateAccesToken(u.getUsername(), usuario.getId(), parts[parts.length-1]);
         response.addHeader("Authorization", token);
         Map<String, String> httpResponse = new HashMap<>();
         httpResponse.put("id", String.valueOf(usuario.getId()));
+        httpResponse.put("type", parts[parts.length-1]);
         httpResponse.put("token", token);
         httpResponse.put("message", "Correct Authentication");
         httpResponse.put("Username", u.getUsername());

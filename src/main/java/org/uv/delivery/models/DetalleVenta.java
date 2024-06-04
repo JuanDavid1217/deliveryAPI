@@ -6,7 +6,6 @@ package org.uv.delivery.models;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -83,12 +82,5 @@ public class DetalleVenta implements Serializable{
 
     public double getDecuento() {
         return decuento;
-    }
-    
-    public BigDecimal calculateSub(){
-        BigDecimal sub=this.precio.multiply(new BigDecimal(this.cantidad));
-        BigDecimal discount=sub.multiply(new BigDecimal(this.decuento));
-        discount = discount.divide(new BigDecimal(100));
-        return null;
     }
 }

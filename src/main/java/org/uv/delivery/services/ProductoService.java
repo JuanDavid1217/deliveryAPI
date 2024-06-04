@@ -100,8 +100,12 @@ public class ProductoService {
         if(!optionalProducto.isEmpty()){
             String email=SecurityContextHolder.getContext().getAuthentication().getName();
             if (optionalProducto.get().getTienda().getEncargado().getEmail().equals(email)){
-                productoRepository.delete(optionalProducto.get());
-                return true;
+                try{
+                    productoRepository.delete(optionalProducto.get());
+                    return true;
+                }catch(Exception e){
+                    throw new Exceptions("El producto: "+optionalProducto.get().getNombre()+" no se puede eliminar ya que presenta relaciones.", HttpStatus.CONFLICT);
+                }
             }else{
                 throw new Exceptions(acceso, HttpStatus.CONFLICT);
             }
