@@ -47,6 +47,7 @@ public class RepartidorNuevoConverter implements ConverterNuevo<Repartidor, Repa
         repartidor.setPassword(dto.getPassword());
         repartidor.setTelefono(dto.getTelefono());
         repartidor.setVehiculo(vehiculoConverter.dtotoEntity(dto.getVehiculo()));
+        repartidor.setUrlFoto(dto.getUrlFoto());
         return repartidor;
     }
 

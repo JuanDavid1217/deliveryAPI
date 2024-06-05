@@ -15,8 +15,16 @@ public abstract class UsuarioDTO{
     private String fechaNacimiento;
     private String email;
     private String telefono;
-    
-    
+    private String urlFoto;
+
+    public String getUrlFoto() {
+        return urlFoto;
+    }
+
+    public void setUrlFoto(String urlFoto) {
+        this.urlFoto = urlFoto;
+    }
+   
     public String getNombre() {
         return nombre;
     }

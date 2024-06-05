@@ -34,6 +34,7 @@ public class RepartidorActualizarConverter implements ConverterNuevo<Repartidor,
         repartidor.setLicencia(dto.getLicencia());
         repartidor.setNombre(dto.getNombre());
         repartidor.setTelefono(dto.getTelefono());
+        repartidor.setUrlFoto(dto.getUrlFoto());
         return repartidor;
     }
 

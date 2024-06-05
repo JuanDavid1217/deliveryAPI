@@ -32,6 +32,7 @@ public class EncargadoRegistradoConverter implements ConverterRegistrado<Encarga
         encargado.setIne(entity.getIne());
         encargado.setNombre(entity.getNombre());
         encargado.setTelefono(entity.getTelefono());
+        encargado.setUrlFoto(entity.getUrlFoto());
         return encargado;
     }
 

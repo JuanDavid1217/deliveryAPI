@@ -51,6 +51,8 @@ public abstract class UsuarioBase {
     @OneToOne(cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
     @JoinColumn(name="direccion")
     private Direccion direccion;
+    @Column(name="foto_perfil")
+    private String urlFoto;
     
     public long getId() {
         return this.idUsuario;
@@ -123,5 +125,13 @@ public abstract class UsuarioBase {
 
     public void setDireccion(Direccion direccion) {
         this.direccion=direccion;
+    }
+    
+    public String getUrlFoto(){
+        return urlFoto;
+    }
+    
+    public void setUrlFoto(String urlFoto){
+        this.urlFoto = urlFoto;
     }
 }
