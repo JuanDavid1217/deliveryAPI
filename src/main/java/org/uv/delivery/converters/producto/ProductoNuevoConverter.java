@@ -13,6 +13,7 @@ import org.uv.delivery.dtos.producto.ProductoNuevoDTO;
 import org.uv.delivery.models.Categoria;
 import org.uv.delivery.models.Producto;
 import org.uv.delivery.models.Tienda;
+import org.uv.delivery.repository.CategoriaRepository;
 
 /**
  *
@@ -20,7 +21,12 @@ import org.uv.delivery.models.Tienda;
  */
 @Component
 public class ProductoNuevoConverter implements ConverterNuevo<Producto, ProductoNuevoDTO>{
-
+    private final CategoriaRepository categoriaRepository;
+    
+    public ProductoNuevoConverter(CategoriaRepository categoriaRepository){
+        this.categoriaRepository = categoriaRepository;
+    }
+    
     @Override
     public Producto dtotoEntity(ProductoNuevoDTO dto) {
         Producto producto = new Producto();
@@ -34,10 +40,8 @@ public class ProductoNuevoConverter implements ConverterNuevo<Producto, Producto
         tienda.setIdTienda(dto.getIdTienda());
         producto.setTienda(tienda);
         List<Categoria> categorias = new ArrayList<>();
-        Categoria categoria = new Categoria();
         for (long id:dto.getCategoriasId()){
-            categoria.setIdCategoria(id);
-            categorias.add(categoria);
+            categorias.add(categoriaRepository.getById(id));
         }
         producto.setCategorias(categorias);
         return producto;
