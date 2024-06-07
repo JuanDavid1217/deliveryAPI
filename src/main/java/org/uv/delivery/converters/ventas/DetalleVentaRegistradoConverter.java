@@ -29,7 +29,7 @@ public class DetalleVentaRegistradoConverter implements ConverterRegistrado<Deta
         detalle.setIdProducto(entity.getProducto().getIdProducto());
         detalle.setIdVenta(entity.getVenta().getIdVenta());
         detalle.setImagen(entity.getProducto().getImagen());
-        detalle.setNombre(entity.getProducto().getImagen());
+        detalle.setNombre(entity.getProducto().getNombre());
         detalle.setPrecio(entity.getPrecio());
         return detalle;
     }
