@@ -5,15 +5,18 @@
 package org.uv.delivery.models.usuario;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import org.uv.delivery.models.Vehiculo;
+import org.uv.delivery.models.Venta;
 
 /**
  *
@@ -27,6 +30,8 @@ public class Repartidor extends Trabajador implements Serializable{
     @OneToOne(cascade={CascadeType.REMOVE, CascadeType.MERGE}, fetch=FetchType.LAZY)
     @JoinColumn(name="id_vehiculo", foreignKey = @ForeignKey(name = "fk_trabajador_direccion"))
     private Vehiculo vehiculo;
+    @OneToMany(mappedBy="repartidor", fetch=FetchType.LAZY)
+    private List<Venta> ventas;
     
     
     public String getLicencia() {
@@ -43,6 +48,14 @@ public class Repartidor extends Trabajador implements Serializable{
 
     public void setVehiculo(Vehiculo vehiculo) {
         this.vehiculo = vehiculo;
+    }
+
+    public List<Venta> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(List<Venta> ventas) {
+        this.ventas = ventas;
     }
     
     
